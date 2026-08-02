@@ -97,5 +97,3 @@ Four simple screenshots show the interactive UI (served at `/ui`). Replace these
 - Avoid claiming production deployment or enterprise-scale guarantees — present this as a demonstration and learning project.
 
 ---
-
-If you'd like, I can (A) add short runnable commands for Windows/macOS, (B) add screenshot files into `docs/images/`, or (C) remove the bundled model and show how to generate it on demand. Which would you prefer?
