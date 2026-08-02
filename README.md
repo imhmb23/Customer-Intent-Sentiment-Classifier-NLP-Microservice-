@@ -14,6 +14,9 @@ This is a clear, compact example for a junior developer portfolio — concise, r
 - Unit and integration tests with `pytest`.
 
 ## 3. Technology stack
+
+![UI 4](docs/images/architecture.png)
+
 - Python 3.9+ (recommended)
 - scikit-learn, pandas, numpy
 - FastAPI + Uvicorn
@@ -76,10 +79,10 @@ The tests include small unit checks for the cleaner and a couple of API integrat
 ## 7. UI screenshots
 Four simple screenshots show the interactive UI (served at `/ui`). Replace these with real images if desired.
 
-![UI 1](docs/images/ui_1.png)
-![UI 2](docs/images/ui_2.png)
-![UI 3](docs/images/ui_3.png)
-![UI 4](docs/images/ui_4.png)
+![UI 1](docs/images/1.png)
+![UI 2](docs/images/2.png)
+![UI 3](docs/images/3.png)
+![UI 4](docs/images/4.png)
 
 ## 8. Files of interest (for reviewers)
 - `src/app.py` — FastAPI app and endpoints
