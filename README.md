@@ -20,28 +20,7 @@ It is designed as a practical, production-ready work sample for a **Junior Data 
 
 ## 3. High-Level Architecture & Technical Stack
 
-```
-[Customer Text Input]
-        │
-        ▼
-[FastAPI Endpoint: POST /predict]
-        │
-        ▼
-[Pydantic Schema Validation]
-        │
-        ▼
-[Custom Text Preprocessor (src/cleaner.py)]
-  - Lowercasing, Regex stripping, Stopword filtering (preserving negations)
-        │
-        ▼
-[Scikit-Learn Pipeline (models/tfidf_intent_pipeline.joblib)]
-  - TF-IDF Vectorizer (unigrams + bigrams)
-  - Logistic Regression Classifier (class_weight='balanced')
-        │
-        ▼
-[JSON Response Output]
-  - Predicted Class, Probability/Confidence Score, Processing Latency (ms)
-```
+![Architecture and Stack](docs/images/architecture.png)
 
 ### Technology Stack
 * **Language:** Python 3.9+
@@ -121,10 +100,10 @@ def health():
 
 A simple visual overview of the interactive UI (served at the `/ui` path). The images below demonstrate the main text input form, example chips, history panel, and the prediction/confidence output.
 
-![UI Screenshot 1](docs/images/ui_1.png)
-![UI Screenshot 2](docs/images/ui_2.png)
-![UI Screenshot 3](docs/images/ui_3.png)
-![UI Screenshot 4](docs/images/ui_4.png)
+![UI Screenshot 1](docs/images/1.png)
+![UI Screenshot 2](docs/images/2.png)
+![UI Screenshot 3](docs/images/3.png)
+![UI Screenshot 4](docs/images/4.png)
 
 ---
 
