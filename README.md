@@ -3,7 +3,7 @@
 ## 1. Overview
 A small, self-contained demonstration project that accepts customer text, predicts an intent label (e.g., Billing, Technical Support, Account Cancellation, General Inquiry), and returns a simple confidence score. This repository shows basic data preprocessing, a simple machine learning pipeline, a small FastAPI service, unit tests, and a lightweight browser UI.
 
-This is a clear, compact example for a junior developer portfolio — concise, runnable, and easy to explain in an interview.
+This is a clear, compact example for a junior developer portfolio , concise, runnable, and easy to explain in an interview.
 
 ## 2. What I built
 - Synthetic dataset generation script (so reviewers can reproduce results without external downloads).
@@ -52,8 +52,8 @@ uvicorn src.app:app --reload --host 127.0.0.1 --port 8000
 Open `http://127.0.0.1:8000/ui` to use the browser UI, or call the API with `POST /predict`.
 
 ## 5. API usage (examples)
-- Health check: `GET /health` — returns a small JSON confirming the app is running.
-- Prediction: `POST /predict` with JSON body `{ "text": "..." }` — returns predicted intent and a confidence score.
+- Health check: `GET /health` , returns a small JSON confirming the app is running.
+- Prediction: `POST /predict` with JSON body `{ "text": "..." }` , returns predicted intent and a confidence score.
 
 Minimal FastAPI health example (for reviewers):
 
@@ -85,15 +85,15 @@ Four simple screenshots show the interactive UI (served at `/ui`). Replace these
 ![UI 4](docs/images/4.png)
 
 ## 8. Files of interest (for reviewers)
-- `src/app.py` — FastAPI app and endpoints
-- `src/cleaner.py` — text preprocessing utilities
-- `src/train.py` — data generation and training helper
-- `models/tfidf_intent_pipeline.joblib` — serialized pipeline (small example model)
-- `static/index.html` — simple browser UI
+- `src/app.py` , FastAPI app and endpoints
+- `src/cleaner.py` , text preprocessing utilities
+- `src/train.py` , data generation and training helper
+- `models/tfidf_intent_pipeline.joblib` , serialized pipeline (small example model)
+- `static/index.html` , simple browser UI
 
 ## 9. Notes for interview
 - This project is intentionally compact so it is easy to explain end-to-end.
 - Focus talking points: problem definition, simple preprocessing choices, why a lightweight model was chosen for this demo, how the API and UI connect, and how tests validate behavior.
-- Avoid claiming production deployment or enterprise-scale guarantees — present this as a demonstration and learning project.
+- Avoid claiming production deployment or enterprise-scale guarantees , present this as a demonstration and learning project.
 
 ---
