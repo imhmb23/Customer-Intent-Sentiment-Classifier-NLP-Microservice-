@@ -1,0 +1,10 @@
+
+venv/
+__pycache__/
+*.pyc
+/.vscode/
+
+# Ignore all joblib files by default but allow committing the trained pipeline
+*.joblib
+!models/tfidf_intent_pipeline.joblib
+

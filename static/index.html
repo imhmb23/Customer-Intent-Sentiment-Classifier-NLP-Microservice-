@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Intent Classifier UI</title>
+    <style>
+      :root{--accent:#2563eb;--success:#16a34a;--muted:#6b7280}
+      body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:#f3f4f6;color:#111827;padding:2rem}
+      .container{max-width:900px;margin:0 auto}
+      .card{background:#fff;border-radius:8px;padding:1.25rem;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+      textarea{width:100%;height:120px;padding:0.75rem;border:1px solid #e5e7eb;border-radius:6px;font-size:14px}
+      .controls{display:flex;gap:8px;margin-top:10px;align-items:center}
+      button{background:var(--accent);color:#fff;border:none;padding:0.6rem 0.9rem;border-radius:6px;cursor:pointer}
+      button[disabled]{opacity:0.6;cursor:default}
+      .examples{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+      .chip{background:#eef2ff;color:var(--accent);padding:6px 10px;border-radius:999px;cursor:pointer;border:1px solid #e0e7ff}
+      .result{margin-top:12px}
+      .result-card{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px;border-radius:8px;border:1px solid #e6eef8;background:#fbfdff}
+      .intent{font-weight:700;font-size:1.1rem}
+      .confidence{color:var(--muted)}
+      .bar{height:10px;background:#e6eef8;border-radius:999px;overflow:hidden;margin-top:6px}
+      .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed)}
+      .meta{font-size:13px;color:var(--muted)}
+      .history{margin-top:12px}
+      .history-item{padding:8px;border-radius:6px;border:1px dashed #e6eef8;background:#fff;margin-bottom:6px}
+      .row{display:flex;gap:8px}
+      .btn-ghost{background:transparent;border:1px solid #e5e7eb;padding:6px 8px;border-radius:6px;cursor:pointer}
+      .small{font-size:13px;padding:6px 8px}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h2>Intent Classifier</h2>
+        <p class="meta">Enter a customer message and click <strong>Predict</strong>. Results show predicted intent, confidence and latency.</p>
+
+        <textarea id="text">My app crashes when I try to login.</textarea>
+
+        <div class="controls">
+          <button id="btn">Predict</button>
+          <button id="clear" class="btn-ghost small">Clear</button>
+          <button id="copy" class="btn-ghost small">Copy Result</button>
+          <div style="margin-left:auto" class="meta">Examples:</div>
+        </div>
+
+        <div class="examples" id="examples">
+          <div class="chip">My app crashes when I login</div>
+          <div class="chip">I was double charged on my invoice</div>
+          <div class="chip">Please cancel my subscription</div>
+          <div class="chip">What are your support hours?</div>
+        </div>
+
+        <div class="result" id="resultArea">
+          <h3>Result</h3>
+          <div id="placeholder" class="meta">No prediction yet.</div>
+        </div>
+
+        <div class="history" id="historyWrap">
+          <h4>Recent queries</h4>
+          <div id="history"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const btn = document.getElementById('btn');
+      const txt = document.getElementById('text');
+      const resultArea = document.getElementById('resultArea');
+      const placeholder = document.getElementById('placeholder');
+      const examples = document.getElementById('examples');
+      const historyEl = document.getElementById('history');
+      const clearBtn = document.getElementById('clear');
+      const copyBtn = document.getElementById('copy');
+
+      const STORE_KEY = 'intent_ui_history_v1';
+
+      function loadHistory(){
+        try{
+          const raw = localStorage.getItem(STORE_KEY);
+          return raw? JSON.parse(raw) : [];
+        }catch(e){return []}
+      }
+
+      function saveHistory(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr.slice(0,20))) }
+
+      function renderHistory(){
+        const arr = loadHistory();
+        historyEl.innerHTML = '';
+        if(arr.length===0){ historyEl.innerHTML = '<div class="meta">No recent queries</div>'; return }
+        arr.forEach(item=>{
+          const d = document.createElement('div'); d.className='history-item';
+          d.innerHTML = `<div><strong>${item.intent}</strong> <span class="meta">(${(item.confidence*100).toFixed(1)}%)</span></div><div class="meta">${item.text}</div><div class="meta">Latency: ${item.latency_ms.toFixed(1)} ms</div>`;
+          historyEl.appendChild(d);
+        })
+      }
+
+      function showResult(json){
+        placeholder.style.display = 'none';
+        resultArea.querySelectorAll('.result-card').forEach(n=>n.remove());
+
+        const card = document.createElement('div'); card.className='result-card';
+        const left = document.createElement('div');
+        left.innerHTML = `<div class="intent">${json.predicted_intent}</div><div class="confidence">Confidence: ${(json.confidence*100).toFixed(1)}%</div><div class="bar"><i style="width:${(json.confidence*100)}%"></i></div>`;
+        const right = document.createElement('div');
+        right.innerHTML = `<div class="meta">Latency: ${json.latency_ms.toFixed(1)} ms</div><div style="margin-top:6px" class="meta">Text: ${json.text}</div>`;
+        card.appendChild(left); card.appendChild(right);
+        resultArea.appendChild(card);
+      }
+
+      async function predict(){
+        const text = txt.value.trim();
+        if(!text){ alert('Please enter a message'); return }
+        btn.disabled = true; btn.textContent='Predicting...';
+        try{
+          const resp = await fetch('/predict', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+          if(!resp.ok){ const t = await resp.text(); throw new Error(t||resp.status) }
+          const j = await resp.json();
+          showResult(j);
+          // update history
+          const hist = loadHistory(); hist.unshift(j); saveHistory(hist);
+          renderHistory();
+        }catch(err){ placeholder.innerHTML = `<pre style="color:#b91c1c">${err}</pre>` }
+        finally{ btn.disabled=false; btn.textContent='Predict' }
+      }
+
+      // examples click
+      examples.addEventListener('click', e=>{
+        const el = e.target.closest('.chip'); if(!el) return; txt.value = el.textContent; txt.focus();
+      })
+
+      btn.addEventListener('click', predict);
+      clearBtn.addEventListener('click', ()=>{ txt.value=''; txt.focus(); });
+      copyBtn.addEventListener('click', ()=>{
+        const card = resultArea.querySelector('.result-card');
+        if(!card){ alert('No result to copy'); return }
+        navigator.clipboard.writeText(card.innerText).then(()=>alert('Result copied to clipboard'))
+      });
+
+      // Enter to submit when focused in textarea (Ctrl+Enter for newline)
+      txt.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); predict() } })
+
+      // initial render
+      renderHistory();
+    </script>
+  </body>
+</html>
